@@ -1,0 +1,16 @@
+[package]
+name = "lambda"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.70"
+serde = "1.0.160"
+lambda_http = "0.8.0"
+serde_json = "1.0.96"
+async-trait = "0.1.68"
+lambda_runtime = "0.8.0"
+tokio = { version = "1", features = ["macros"] }
+tracing = { version = "0.1", features = ["log"] }
+world-id-marbles = { version = "0.1.0", path = "../world-id-marbles" }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
