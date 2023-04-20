@@ -1,16 +1,4 @@
-[package]
-name = "world-id-marbles"
-version = "0.1.0"
-edition = "2021"
-description = "Marble generator for World ID."
-license = "MIT"
-repository = "https://github.com/m1guelpf/world-id-marbles"
-readme = "README.md"
-keywords = ["marbles", "world-id"]
-categories = ["library"]
-
-[dependencies]
-indoc = "2.0.1"
-zkp-u256 = { version = "0.2.1", default-features = false, features = ["std"] }
-resvg = { version = "0.31.0", default-features = false, features = ["png", "svgfilters", "filter"] }
-anyhow = "1.0.70"
+[workspace]
+members = [
+    "packages/world-id-marbles",
+]
