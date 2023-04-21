@@ -6,9 +6,12 @@ use resvg::{
     tiny_skia::{Color, Pixmap, Transform},
     usvg::{self, TreeParsing},
 };
+use seed::Seedable;
 use std::{fmt::Debug, fs, path::Path};
 
 pub use ruint::aliases::U256;
+
+mod seed;
 
 const COLORS: [&str; 36] = [
     "#FF0000", "#FF2B00", "#FF5500", "#FF8000", "#FFAA00", "#FFD500", "#FFFF00", "#D4FF00",
@@ -17,38 +20,6 @@ const COLORS: [&str; 36] = [
     "#0000FF", "#2A00FF", "#0000FF", "#5500FF", "#8000FF", "#AA00FF", "#D500FF", "#FF00FF",
     "#FF00D5", "#FF00AA", "#FF0080", "#FF0055",
 ];
-
-pub trait Seedable {
-    fn to_seed(self) -> U256;
-}
-
-impl Seedable for u32 {
-    fn to_seed(self) -> U256 {
-        U256::try_from(self).unwrap()
-    }
-}
-impl Seedable for U256 {
-    fn to_seed(self) -> U256 {
-        self
-    }
-}
-
-impl Seedable for usize {
-    fn to_seed(self) -> U256 {
-        U256::try_from(self).unwrap()
-    }
-}
-
-impl Seedable for String {
-    fn to_seed(self) -> U256 {
-        U256::from_str_radix(&self, 10).unwrap()
-    }
-}
-impl Seedable for &str {
-    fn to_seed(self) -> U256 {
-        U256::from_str_radix(self, 10).unwrap()
-    }
-}
 
 pub struct Marble {
     seed: U256,
@@ -61,9 +32,7 @@ impl Marble {
     ///
     /// Panics if the seed cannot be converted to a `U256`.
     pub fn new(seed: impl Seedable) -> Self {
-        Self {
-            seed: seed.to_seed(),
-        }
+        Self { seed: seed.into() }
     }
 
     fn random_number<T, E>(&mut self, max: T) -> T
@@ -71,7 +40,7 @@ impl Marble {
         E: Debug,
         T: Seedable + TryFrom<U256, Error = E> + Copy,
     {
-        let max = max.to_seed();
+        let max = max.into();
 
         let result = self.seed % max;
         self.seed /= max;
@@ -143,7 +112,7 @@ impl Marble {
                 </svg>
         "##,
             shapes = self.random_sort(shapes).join(""),
-            rotation = self.random_number(359_u32),
+            rotation = self.random_number(359),
         )
     }
 
