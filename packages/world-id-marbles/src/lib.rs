@@ -23,6 +23,7 @@ const COLORS: [&str; 36] = [
 
 pub struct Marble {
     seed: U256,
+    colors: Option<[String; 3]>,
 }
 
 impl Marble {
@@ -32,7 +33,10 @@ impl Marble {
     ///
     /// Panics if the seed cannot be converted to a `U256`.
     pub fn new(seed: impl Seedable) -> Self {
-        Self { seed: seed.into() }
+        Self {
+            colors: None,
+            seed: seed.into(),
+        }
     }
 
     fn random_number<T, E>(&mut self, max: T) -> T
@@ -64,9 +68,23 @@ impl Marble {
         COLORS[self.random_number(COLORS.len())]
     }
 
+    pub fn get_colors(&mut self) -> &[String; 3] {
+        if self.colors.is_none() {
+            self.colors = Some([
+                self.random_color().to_string(),
+                self.random_color().to_string(),
+                self.random_color().to_string(),
+            ]);
+        }
+
+        self.colors.as_ref().unwrap_or_else(|| unreachable!())
+    }
+
     /// Build the SVG for the marble.
     #[must_use]
     pub fn build_svg(&mut self) -> String {
+        let colors = self.get_colors();
+
         let shapes = vec![
             formatdoc!(
                 r#"
@@ -74,7 +92,7 @@ impl Marble {
                     <ellipse cx="33.545" cy="32.494" fill="{color}" rx="33.545" ry="32.494" transform="matrix(-.48289 -.87568 .7985 -.602 9.46 74.034)"/>
                 </g>
             "#,
-                color = self.random_color()
+                color = colors[0]
             ),
             formatdoc!(
                 r#"
@@ -82,7 +100,7 @@ impl Marble {
                     <path fill="{color}" d="M78.824-16.686c17.78 14.541 4.24 87.76-2.637 82.948-4.194-2.935-9.153-27.765-22.32-38.405-8.418-6.802-23.488-1.839-33.086-1.137-24.614 1.8 40.115-58.069 58.043-43.406Z"/>
                 </g>
             "#,
-                color = self.random_color()
+                color = colors[1]
             ),
             formatdoc!(
                 r#"
@@ -90,7 +108,7 @@ impl Marble {
                     <ellipse cx="39.533" cy="39.042" fill="{color}" rx="39.533" ry="39.042" transform="matrix(-.2882 -.95757 .93652 -.35062 13.847 67.74)" />
                 </g>
             "#,
-                color = self.random_color()
+                color = colors[2]
             ),
         ];
 
